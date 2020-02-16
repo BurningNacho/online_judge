@@ -35,7 +35,7 @@
 # White wins.
 # Tie.
 # Sample Input
-# 2H 3D 5S 9C KD 2C 3H 4S 8C AH
+# 2H 3D 5S 9C KD                2C 3H 4S 8C AH
 # 2H 4S 4C 2D 4H 2S 8S AS QS 3S
 # 2H 3D 5S 9C KD 2C 3H 4S 8C KH
 # 2H 3D 5S 9C KD 2D 3H 5C 9S KH
@@ -45,24 +45,87 @@
 # Black wins.
 # Tie.
 
-def pick_winner(line):
-    print(line)
+
+playing_cards = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'J', 'Q', 'K', 'R'] ## T == B, A == R
+straight_flush = 8
+four_of_a_kind = 7
+full_house = 6
+flush = 5
+straight = 4
+three_of_a_kind = 3
+two_pairs = 2
+pair = 1
+high_card = 0
+
+def nex_card(card, i):
+    return playing_cards[(playing_cards.index(card)+i) % 14] ## Rotatory
+
+def max_rank(hand):
+    numbers = [card[0] for card in hand]
+    suits = [card[1] for card in hand]
+    best_hand = []
+    if suits.count(suits[0]) == 5:
+        if not False in [number == nex_card(numbers[0],i) for i,number in enumerate(numbers)]:
+            return [straight_flush, hand[4][0]]
+        best_hand = [flush, hand[4][0], hand[3][0], hand[2][0], hand[1][0], hand[0][0]]
+
+    if numbers.count(numbers[2]) == 4:
+        return [four_of_a_kind, hand[2][0]]
+
+    if not False in [number == nex_card(numbers[0],i) for i,number in enumerate(numbers)]:
+        return [straight, hand[4][0]]
+
+    if numbers.count(numbers[1]) == 2 or numbers.count(numbers[3]) == 2:
+        if numbers.count(numbers[2]) == 3:
+            return [full_house, hand[2][0]]
+        if best_hand:
+            return best_hand
+        if numbers.count(numbers[1]) == numbers.count(numbers[3]):
+            best_hand = [two_pairs, max(numbers[1], numbers[3]), min(numbers[1], numbers[3])]
+            best_hand.append(''.join(reversed(numbers)).replace(best_hand[1],'').replace(best_hand[2],''))
+            return best_hand
+        if numbers.count(numbers[1]) == 2:
+            best_hand = [pair, numbers[1]]
+            return best_hand + [number for number in reversed(numbers) if number != numbers[1]]
+        else:
+            best_hand = [pair, numbers[3]]
+            return best_hand + [number for number in reversed(numbers) if number != numbers[3]]
+
+    if numbers.count(numbers[2]) == 3:
+        best_hand = [three_of_a_kind, numbers[2]]
+        return best_hand + [number for number in reversed(numbers) if number != numbers[3]]
+    if best_hand:
+        return best_hand
+    return [high_card, list(reversed(numbers))]
 
 
+def pick_winner(W_hand, B_hand):
+    W_hand_max = max_rank(W_hand)
+    B_hand_max = max_rank(B_hand)
+    if W_hand_max[0] > B_hand_max[0]:
+        return 'Black wins.'
+    if B_hand_max[0] > W_hand_max[0]:
+        return 'White wins.'
+    for i, j in zip(W_hand_max[1:], B_hand_max[1:]):
+        if str(i) > str(j):
+            return 'Black wins.'
+        if str(i) < str(j):
+            return 'White wins.'
+    return 'Tie.'
 
 if __name__ == '__main__':
 
     poker_game = []
-    line = input()
-    while line:
-        if not(line == ''):
-            poker_game.append(line.strip().split())
+    hands = input()
+    while hands:
+        if not(hands == ''):
+            poker_game.append([[card[0],card[1]] for card in hands.replace('A', 'Z').replace('T','B').replace('K','S').strip().split()])
         try:
-            line = input()
+            hands = input()
         except:
-            line = ''
+            hands = ''
     for hands in poker_game:
         try:
-            pick_winner(hands)
+            print(pick_winner(sorted(hands[:5]), sorted(hands[5:])))
         except:
             pass
