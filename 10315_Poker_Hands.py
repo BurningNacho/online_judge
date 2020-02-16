@@ -44,3 +44,25 @@
 # Black wins.
 # Black wins.
 # Tie.
+
+def pick_winner(line):
+    print(line)
+
+
+
+if __name__ == '__main__':
+
+    poker_game = []
+    line = input()
+    while line:
+        if not(line == ''):
+            poker_game.append(line.strip().split())
+        try:
+            line = input()
+        except:
+            line = ''
+    for hands in poker_game:
+        try:
+            pick_winner(hands)
+        except:
+            pass
