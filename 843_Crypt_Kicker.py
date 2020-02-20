@@ -1,20 +1,48 @@
 
-def simple_cycle(words, phrase):
+def backtrack(road):
+    for road_begining, road_options in road.items():
+
+    print(road)
+    return True
+    return True
+    pass
+
+def solve_backtrack(char_matches):
+    for 
+
+
+
+def simple_cycle(words, phrase, not_locked):
     word_matches = {word: list(set([encrypted_word for encrypted_word in phrase if len(encrypted_word) == len(word)])) for word in words if len([encrypted_word for encrypted_word in phrase if len(encrypted_word) == len(word)])}
     word_learnt = {word: word_matches[word][0] for word in word_matches if len(word_matches[word]) == 1}
-    char_matches = {single_char: [] for single_char in ''.join(words)}
-    for letter in char_matches:
+    # print(word_matches)
+    # print(word_learnt)
+    char_matches = {single_char: [] for single_char in [single_char for single_char in ''.join(words)] if single_char in not_locked}
+    for single_char in char_matches:
         for word in words:
-            if letter in word:
+            if single_char in word:
                 if word in word_matches.keys():
                     for i in word_matches[word]:
-                        if i[word.index(letter)] not in char_matches[letter]:
-                            char_matches[letter].append(i[word.index(letter)])
-    char_learnt = {letter: char_matches[letter][0] for letter in char_matches if len(char_matches[letter]) == 1}
+                        if i[word.index(single_char)] not in char_matches[single_char] and i[word.index(single_char)] in not_locked:
+                            # print(i[word.index(single_char)])
+                            char_matches[single_char].append(i[word.index(single_char)])
+    char_learnt = {single_char: char_matches[single_char][0] for single_char in char_matches if len(char_matches[single_char]) == 1}
     for word in word_learnt:
-        for letter in word:
-            char_learnt[letter] = word_learnt[word][word.index(letter)]
-    return char_learnt
+        for single_char in word:
+            if single_char in not_locked:
+                char_learnt[single_char] = word_learnt[word][word.index(single_char)]
+    # for word in word_learnt\
+    # print(char_matches)
+    # print(char_learnt)
+    if char_learnt:
+        return dict(char_learnt)
+    else:
+        for elem_name, elem_vals in word_matches.items():
+            if len(elem_vals) > 1:
+                for val in elem_vals:
+                    path = solve_backtrack(char_matches)
+                    if path:
+                        return path
 
 
 
@@ -30,8 +58,10 @@ def bruteforce(words, phrase):
 
     while len(not_locked): # 0 in locked
         # iteration += 1
-        known_chars = simple_cycle(words, aux_array.split())
+        known_chars = simple_cycle(words, aux_array.split(), not_locked)
+        print(known_chars)
         # rotate = True
+        # print(known_chars)
         for known_char, known_value in known_chars.items():
             if known_char in not_locked and known_value in not_locked and known_char != known_value:
                 jump = not_locked.index(known_char) - not_locked.index(known_value) % len(not_locked) #         (ord(known_char) - ord(known_value)) % len(alphabet)
@@ -42,12 +72,14 @@ def bruteforce(words, phrase):
         #     break
 
         new_array = []
-        locked[ord(known_char) - 97] = 1
 
         for value in aux_array:
             if value != ' ' and value in not_locked:
                 if value == known_value:
                     new_array.append(known_char)
+                    if not locked[ord(known_char) - 97]:
+                        print('\t\t\tLOCKING (%s)' %known_char)
+                        locked[ord(known_char) - 97] = 1
                 else:
                     new_array.append(not_locked[(not_locked.index(value) + jump) % len(not_locked)]) # ((ord(value) - 97 + jump)) % len(not_locked)])
 
@@ -64,6 +96,7 @@ def bruteforce(words, phrase):
         # print('\t\t\t'+''.join([str(i) for i in locked]))
         # print('\t\t\t'+''.join([a for i,a in zip(locked,alphabet) if i]))
         print(f'DECRIPTING ****\t\t{aux_array}')
+        del known_char
 
 
     # input()
