@@ -1,21 +1,32 @@
 
-def backtrack(road):
-    for road_begining, road_options in road.items():
+# def backtrack(road):
+#     for road_begining, road_options in road.items():
+#
+#     print(road)
+#     return True
+#     return True
+#     pass
 
-    print(road)
-    return True
-    return True
-    pass
-
-def solve_backtrack(char_matches):
-    for 
 
 
 
 def simple_cycle(words, phrase, not_locked):
+    # print(words)
+    # print(phrase)
     word_matches = {word: list(set([encrypted_word for encrypted_word in phrase if len(encrypted_word) == len(word)])) for word in words if len([encrypted_word for encrypted_word in phrase if len(encrypted_word) == len(word)])}
     word_learnt = {word: word_matches[word][0] for word in word_matches if len(word_matches[word]) == 1}
     # print(word_matches)
+    for word, word_match in word_matches.items():
+        for single_match in word_match:
+            for i, single_char in enumerate(word):
+                if single_char == '-' and single_match[i] != '-':
+                    word_matches[word].remove(single_match)
+                    break
+                if single_char != '-' and single_match[i] == '-':
+                    word_matches[word].remove(single_match)
+                    break
+
+
     # print(word_learnt)
     char_matches = {single_char: [] for single_char in [single_char for single_char in ''.join(words)] if single_char in not_locked}
     for single_char in char_matches:
@@ -34,15 +45,15 @@ def simple_cycle(words, phrase, not_locked):
     # for word in word_learnt\
     # print(char_matches)
     # print(char_learnt)
-    if char_learnt:
-        return dict(char_learnt)
-    else:
-        for elem_name, elem_vals in word_matches.items():
-            if len(elem_vals) > 1:
-                for val in elem_vals:
-                    path = solve_backtrack(char_matches)
-                    if path:
-                        return path
+    return dict(char_learnt)
+    # if char_learnt:
+    # else:
+    #     for elem_name, elem_vals in word_matches.items():
+    #         if len(elem_vals) > 1:
+    #             for val in elem_vals:
+    #                 path = solve_backtrack(char_matches)
+    #                 if path:
+    #                     return path
 
 
 
@@ -56,10 +67,21 @@ def bruteforce(words, phrase):
 
     # iteration = -1
 
-    while len(not_locked): # 0 in locked
+    while not_decrypted: # 0 in locked
         # iteration += 1
-        known_chars = simple_cycle(words, aux_array.split(), not_locked)
-        print(known_chars)
+        new_array = aux_array
+        new_words = ' '.join(words)
+        # print(new_array)
+        # print(new_words)
+        # print([alphabet[idx] for idx,i in enumerate(locked) if i])
+        for locked_char in [alphabet[idx] for idx,i in enumerate(locked) if i]:
+
+            new_array = new_array.replace(locked_char, '-')
+            new_words = new_words.replace(locked_char, '-')
+
+
+        known_chars = simple_cycle(new_words.split(), new_array.split(), not_locked)
+        # print(known_chars)
         # rotate = True
         # print(known_chars)
         for known_char, known_value in known_chars.items():
@@ -78,7 +100,7 @@ def bruteforce(words, phrase):
                 if value == known_value:
                     new_array.append(known_char)
                     if not locked[ord(known_char) - 97]:
-                        print('\t\t\tLOCKING (%s)' %known_char)
+                        # print('\tLOCKING (%s)' %known_char)
                         locked[ord(known_char) - 97] = 1
                 else:
                     new_array.append(not_locked[(not_locked.index(value) + jump) % len(not_locked)]) # ((ord(value) - 97 + jump)) % len(not_locked)])
