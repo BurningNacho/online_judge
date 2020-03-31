@@ -1,40 +1,26 @@
+import math
 
-def my_island(n_vertices, vertices):
-    # x_vertices = [int(v[0]) for v in vertices]
-    # y_vertices = [int(v[1]) for v in vertices]
-    # print(vertices)
-    # print(f'{x_vertices} {y_vertices}')
-    max_x = 0
-    max_y = 0
+def lattice_p(x1,y1,x2,y2):
+    return math.gcd(x2-x1, y2-y1)-1
+def determinant(x1, y1, x2, y2):
+    return x1*y2-x2*y1
+def poligonArea(vertices):
+    area = 0
+    lattice = 0
+    i = -1
     for v_x, v_y in vertices:
-        if int(v_x) > max_x: max_x = int(v_x)
-        if int(v_y) > max_y: max_y = int(v_y)
-    # print(f'{max_x} {max_y}')
-
-    island_planning = [[0]*(max_y+1)]*(max_x+1)
-
-    for row in island_planning:
-        print(''.join([str(pos) for pos in row]))
-
-    print()
-    for v_x, v_y in vertices:
-        island_planning[int(v_x)][int(v_y)] = 1
-
-    for row in island_planning:
-        print(''.join([str(pos) for pos in row]))
-
-    print(f'{max_x} {max_y}')
-    pass
+        area += determinant(int(vertices[i][0]), int(vertices[i][1]) ,int(v_x), int(v_y))
+        lattice += lattice_p(int(vertices[i][0]), int(vertices[i][1]) ,int(v_x), int(v_y))
+        i += 1
+    return int(abs(area)/2-(lattice/2 + len(vertices)/2)+1)
 
 if __name__ == '__main__':
 
     problem_input = []
     n_vertices = int(input())
     while n_vertices:
-
-        problem_input.append([n_vertices, [input().split() for i in range(n_vertices)]])
-        # print(problem_input)
+        problem_input.append([n_vertices, [input().split() for _ in range(n_vertices)]])
         n_vertices = int(input())
 
     for problem in problem_input:
-        my_island(problem[0], problem[1])
+        print(poligonArea(problem[1]))
